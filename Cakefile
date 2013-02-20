@@ -18,5 +18,4 @@ task 'build:parser', 'build the peg.js parser', ->
   grammar = readFileSync('src/grammar.pegjs').toString()
   parser = PEG.buildParser grammar,
     trackLineAndColumn: on
-
   writeFileSync "./lib/grammar-parser.js", "module.exports = #{parser.toSource()}"

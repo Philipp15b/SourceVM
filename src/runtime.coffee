@@ -4,21 +4,18 @@
 module.exports = class Runtime
   constructor: ->
     @commands = {} # object of commands with associated callbacks
-    @binds = {} # object of binds with associated blocks
+    @binds = {} # object of binds with the associated command
     @aliases = {} # object of aliases with associated blocks
-
-  registerCommand: (name, cb) ->
-    @commands[name] = cb
 
   handleCommandNotFound: (node) ->
     console.warn "Could not find command #{node.name} in line #{node.line}, column #{node.column}!"
 
   run: (root) ->
     runNode = (node) =>
-      switch node.type
-        when "Block" then runBlock node
+      switch node.constructor.name
+        when "Block"   then runBlock node
         when "Command" then runCommand node
-        when "Comment" then undefined
+        when "Comment" then # nothing
         else throw new Error "Unknown node type #{node.type}!"
       undefined
 
@@ -27,18 +24,12 @@ module.exports = class Runtime
         runNode node
       undefined
 
-    runCommand = (command) =>
-      if command.name is "alias" # set an alias
-        @aliases[command.args[0]] = command.args[1]
-      else if command.name is "bind" # set a bind
-        @binds[command.args[0]] = command.args[1]
-      else
-        if @aliases[command.name]? # find an alias
-          runBlock @aliases[command.name]
-        else if @commands[command.name]? # find a command
-          @commands[command.name](command.args)
-        else
-          @handleCommandNotFound command
+    runCommand = (cmd) =>
+      if      cmd.name is "alias"  then @aliases[cmd.args[0]] = cmd.args[1]
+      else if cmd.name is "bind"   then @binds[cmd.args[0]] = cmd.args[1]
+      else if @aliases[cmd.name]?  then runBlock @aliases[cmd.name]
+      else if @commands[cmd.name]? then @commands[cmd.name](cmd.args)
+      else    @handleCommandNotFound cmd
       undefined
 
     runBlock root

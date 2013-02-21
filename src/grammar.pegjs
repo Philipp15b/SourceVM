@@ -46,7 +46,7 @@ Command "Command"
   = name:("alias" / "bind") __ arg1:StringLiteral __  arg2:InlineProgram
     { return new n.Command(name, [arg1, arg2]).p(line, column); }
   / name:(!("alias" / "bind") Identifier) args:(__ StringLiteral)*
-    { return new n.Command(name[1], args === "" ? null : helpers.every(1, args)).p(line, column); }
+    { return new n.Command(name[1], args === "" ? [] : helpers.every(1, args)).p(line, column); }
 
 InlineProgram
   = '""'
@@ -54,4 +54,4 @@ InlineProgram
   / '"' program:((_ Command _ ';')* _ Command)? '"'
     { return new n.Block(helpers.filterInlineProgram(program)).p(line, column); }
   / name:Identifier
-    { return new n.Block([new n.Command(name, null).p(line, column)]).p(line, column); }
+    { return new n.Block([new n.Command(name, []).p(line, column)]).p(line, column); }

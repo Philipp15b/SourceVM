@@ -1,7 +1,7 @@
 {
   "name": "source-vm",
   "description": "A VM for Valve's configurations",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "maintainers": [
     {
       "name": "Philipp Schroer",
